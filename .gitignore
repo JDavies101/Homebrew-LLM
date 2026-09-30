@@ -1,0 +1,15 @@
+# assistant config (kept local)
+.claude/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# data, checkpoints, logs
+data/
+checkpoints/
+*.pt
+*.bin
+wandb/
