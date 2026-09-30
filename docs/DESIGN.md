@@ -91,8 +91,22 @@ Each change alone at 124M for ~300M tokens (~2.3 h each), against a baseline run
 - [ ] Fixed set of 50 prompts, blind-graded against the base model.
 - **Gate:** >= 70% of the 50 prompts pass (follows the instruction and format).
 
-### P8: Write-up
-- [ ] Loss curves, ablation table, eval table, lessons learned.
+### P8: Watermarking and detection (~1 week)
+Keyed hash watermark in the sampler (green-list scheme, Kirchenbauer et al. 2023) and a
+standalone detector. Can be prototyped on the P4 checkpoint; final numbers on the P7 chat model.
+- [ ] Sampler: for each step, hash (secret key, previous token id) -> seed; split the vocabulary
+  into a green list (fraction gamma = 0.25) and red list; add bias delta = 2.0 to green logits.
+- [ ] Detector: needs only the key and tokenizer, not the model. Re-hash each token's context,
+  count green hits G over T scored tokens (repeated context/token pairs scored once),
+  z = (G - gamma * T) / sqrt(T * gamma * (1 - gamma)).
+- [ ] Quality cost: base-model perplexity of watermarked vs unwatermarked samples, same prompts.
+- [ ] Robustness report (no gate): detection vs % of tokens randomly substituted, and vs length.
+- **Gate:** at z threshold 4: false-positive rate <= 1% on 1,000 held-out FineWeb-Edu passages
+  (200 tokens each); true-positive rate >= 95% on 200-token watermarked samples; perplexity
+  increase <= 15%; unknown key gives z consistent with N(0, 1).
+
+### P9: Write-up
+- [ ] Loss curves, ablation table, eval table, watermark detection curves, lessons learned.
 - **Deliverable:** portfolio write-up alongside the Homebrew CFD solver.
 
 ## 6. Decisions
@@ -102,10 +116,13 @@ Each change alone at 124M for ~300M tokens (~2.3 h each), against a baseline run
 - 2026-09-30: bits-per-byte logged alongside val loss so results compare across tokenizers.
 - 2026-09-30: code edited on Windows, training on Fedora; repo synced through GitHub.
 
+- 2026-09-30: added P8 watermarking (keyed green-list hash, z-score detector) before the write-up.
+
 ## 7. Known limitations
 
 - Small model and data budget: frequent factual errors; no real coding, reasoning or long context.
 - Single training run per stage; no hyperparameter sweeps beyond P5.
+- Watermark is removable by paraphrasing or heavy editing, and weak on short or low-entropy text.
 - Ablations are one-at-a-time at 124M and short horizon; interactions and scale effects are not measured.
 
 ## 8. Progress notes

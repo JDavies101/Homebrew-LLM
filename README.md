@@ -16,7 +16,9 @@ approach: every stage ends with a measurable gate that must pass before the next
 | Wall time | ~3 days | ~6 days |
 | Gate | HellaSwag >= 29% | HellaSwag >= 33%, val loss below Stage 1 |
 
-After pretraining, the Stage 2 model is supervised fine-tuned into a simple chat model.
+After pretraining, the Stage 2 model is supervised fine-tuned into a simple chat model. Its sampler
+embeds a keyed statistical watermark (hash-seeded green-list logit bias), and a standalone detector
+identifies watermarked text from the key and tokenizer alone.
 
 ## Scope and expectations
 
@@ -35,9 +37,9 @@ evaluation and chat tuning.
 ## Repository layout
 
 ```
-model/    gpt.py, tokenizer.py
+model/    gpt.py, tokenizer.py, watermark.py
 train/    pretrain.py, sft.py, data.py
-eval/     hellaswag.py, sample.py
+eval/     hellaswag.py, sample.py, detect_watermark.py
 tests/    pytest suite
 docs/     DESIGN.md (plan, gates, decisions, limitations), run_log.csv
 ```
@@ -49,4 +51,5 @@ See `docs/DESIGN.md` for phases, gates and progress, and `docs/run_log.csv` for 
 ## References
 
 - A. Karpathy: "Let's build GPT", build-nanogpt, llm.c, minbpe, nanochat
+- J. Kirchenbauer et al., "A Watermark for Large Language Models" (ICML 2023)
 - FineWeb-Edu (HuggingFace), SmolTalk (HuggingFace), HellaSwag (Zellers et al., 2019)
